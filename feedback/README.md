@@ -8,6 +8,7 @@ The core flow is genuinely smooth — chef's kiss to whoever owns that surface. 
 
 - **Latency:** The first popup took a noticeable beat to appear. Could be a Safari quirk on my end rather than the platform.
 - **Permission Sequencing:** The upfront "Add the Brimble app" GitHub permission prompt creates friction before the user has committed to anything. Personal POV: grant access to the dashboard first, defer the GitHub app install to the moment the user actually clicks "New Deploy". Same permission, better sequencing — the ask feels earned instead of gatekeeping.
+- **Session Persistence:** I noticed I keep getting signed out roughly every 24 hours. For a developer dashboard, this feels a bit short. Expanding login retention to 7 days (or adding a "Remember Me" option) would significantly reduce friction for returning users.
 
 ## 2. Non-standard project structure (template engine)
 
@@ -74,6 +75,6 @@ Didn't attempt this pass, I do have an unused domain sitting around that I plan 
 
 ## Summary
 
-Net positive. The core deploy loop is the strongest part of the product: I got a non-trivial project live where two larger PaaS competitors had failed me, and the support response turned a blocking quota bug into a same-day unblock. 
+Net positive. The core deploy loop is the strongest part of the product: I got a non-trivial project live where two larger PaaS competitors had failed me, and the support response turned a blocking quota bug into a same-day unblock.
 
-The friction points — repo-search latency, the quota state mismatch, build-lifecycle gaps, and a couple of UX subtleties — are all concrete and fixable without touching the core architecture. Would recommend, and plan to move more of my side projects over.
+The friction points — repo-search latency, the quota state mismatch, short session duration, build-lifecycle gaps, and a couple of UX subtleties — are all concrete and fixable without touching the core architecture. Would recommend, and plan to move more of my side projects over.
