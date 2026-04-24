@@ -1,0 +1,67 @@
+# Dev override for hot reload. Usage:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Behavior:
+#   * api and worker run under `air` with repo source bind-mounted — save a
+#     Go file and the binary rebuilds + restarts.
+#   * web runs `vite dev` on :5173 with HMR. Vite proxies /api → api:8080
+#     via VITE_API_TARGET, so you hit http://localhost:5173 directly and
+#     don't need Caddy in the dev loop for the frontend.
+#   * Caddy is still the ingress for deployed apps (http://<id>.localhost).
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: cmd/api/Dockerfile.dev
+    command: ["air", "-c", "cmd/api/.air.toml"]
+    volumes:
+      - .:/src
+      - sqlite_data:/data
+      - upload_tmp:/tmp/uploads
+      - go_mod_cache:/go/pkg/mod
+      - go_build_cache:/root/.cache/go-build
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_PATH=/data/app.db
+      - UPLOAD_DIR=/tmp/uploads
+
+  worker:
+    build:
+      context: .
+      dockerfile: cmd/worker/Dockerfile.dev
+    command: ["air", "-c", "cmd/worker/.air.toml"]
+    volumes:
+      - .:/src
+      - sqlite_data:/data
+      - upload_tmp:/tmp/uploads
+      - build_tmp:/tmp/builds
+      - /var/run/docker.sock:/var/run/docker.sock
+      - go_mod_cache:/go/pkg/mod
+      - go_build_cache:/root/.cache/go-build
+    environment:
+      - DB_PATH=/data/app.db
+      - CADDY_ADMIN_URL=http://caddy:2019
+      - DOCKER_NETWORK=not_brimble_net
+      - BUILD_DIR=/tmp/builds
+      - BUILDKIT_HOST=tcp://buildkitd:1234
+      - API_URL=http://api:8080
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_TARGET=http://api:8080
+
+volumes:
+  go_mod_cache:
+  go_build_cache:
+  web_node_modules:

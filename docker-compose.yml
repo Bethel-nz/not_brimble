@@ -1,0 +1,87 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: cmd/api/Dockerfile
+    volumes:
+      - sqlite_data:/data
+      - upload_tmp:/tmp/uploads
+    networks:
+      - not_brimble_net
+    environment:
+      - DB_PATH=/data/app.db
+      - UPLOAD_DIR=/tmp/uploads
+    depends_on:
+      - caddy
+
+  # Worker owns all infrastructure side effects (build, run, route, delete).
+  # It mounts the Docker socket to run/stop containers and talks to buildkitd
+  # over TCP for Railpack builds. The API never touches the Docker socket.
+  worker:
+    build:
+      context: .
+      dockerfile: cmd/worker/Dockerfile
+    volumes:
+      - sqlite_data:/data
+      - upload_tmp:/tmp/uploads
+      - build_tmp:/tmp/builds
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - not_brimble_net
+    environment:
+      - DB_PATH=/data/app.db
+      - CADDY_ADMIN_URL=http://caddy:2019
+      - DOCKER_NETWORK=not_brimble_net
+      - BUILD_DIR=/tmp/builds
+      - BUILDKIT_HOST=tcp://buildkitd:1234
+      - API_URL=http://api:8080
+    depends_on:
+      - caddy
+      - buildkitd
+      - api
+
+  # BuildKit does the actual image assembly work for Railpack. Its cache
+  # directory is mounted on a named volume so layers survive `docker compose
+  # down` and subsequent builds of the same repo reuse cached layers (npm
+  # install, apt install, mise runtime downloads) instead of re-fetching from
+  # scratch every deploy. Repeat deploys drop from minutes to seconds once
+  # the cache is warm.
+  buildkitd:
+    image: moby/buildkit:latest
+    privileged: true
+    command: --addr tcp://0.0.0.0:1234
+    volumes:
+      - buildkit_cache:/var/lib/buildkit
+    networks:
+      - not_brimble_net
+
+  caddy:
+    image: caddy:latest
+    command: caddy run --config /etc/caddy/config.json
+    ports:
+      - "80:80"
+      - "2019:2019"
+    volumes:
+      - ./caddy/config.json:/etc/caddy/config.json
+    networks:
+      - not_brimble_net
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    networks:
+      - not_brimble_net
+    depends_on:
+      - api
+
+volumes:
+  sqlite_data:
+  upload_tmp:
+  build_tmp:
+  buildkit_cache:
+
+networks:
+  not_brimble_net:
+    driver: bridge
+    name: not_brimble_net
