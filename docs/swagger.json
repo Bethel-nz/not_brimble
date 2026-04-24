@@ -1,0 +1,183 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "A one-page deployment pipeline API mirroring Brimble PaaS logic.",
+        "title": "Not Brimble API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/deployments": {
+            "get": {
+                "description": "Get a list of all deployments in the system",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List all deployments",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Deployment"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a deployment from a Git URL or a .tar.gz upload",
+                "consumes": [
+                    "application/json",
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a new deployment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source type (git or upload)",
+                        "name": "sourceType",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Git URL (required if sourceType is git)",
+                        "name": "sourceUrl",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Source archive (required if sourceType is upload)",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/db.Deployment"
+                        }
+                    }
+                }
+            }
+        },
+        "/deployments/{id}": {
+            "get": {
+                "description": "Get detailed information about a specific deployment by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get deployment details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deployment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Deployment"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Enqueue a deployment for deletion (soft delete)",
+                "summary": "Delete a deployment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deployment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
+                    }
+                }
+            }
+        },
+        "/deployments/{id}/redeploy": {
+            "post": {
+                "description": "Create a new deployment using the image from an existing deployment (Rollback)",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Redeploy an existing deployment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source Deployment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/db.Deployment"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "db.Deployment": {
+            "type": "object",
+            "properties": {
+                "caddy_route_id": {
+                    "type": "string"
+                },
+                "container_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_tag": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "source_type": {
+                    "type": "string"
+                },
+                "source_url": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subdomain": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

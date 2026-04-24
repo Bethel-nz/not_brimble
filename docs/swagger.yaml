@@ -1,0 +1,122 @@
+basePath: /
+definitions:
+  db.Deployment:
+    properties:
+      caddy_route_id:
+        type: string
+      container_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      image_tag:
+        type: string
+      name:
+        type: string
+      source_type:
+        type: string
+      source_url:
+        type: string
+      status:
+        type: string
+      subdomain:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A one-page deployment pipeline API mirroring Brimble PaaS logic.
+  title: Not Brimble API
+  version: "1.0"
+paths:
+  /deployments:
+    get:
+      description: Get a list of all deployments in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Deployment'
+            type: array
+      summary: List all deployments
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Create a deployment from a Git URL or a .tar.gz upload
+      parameters:
+      - description: Source type (git or upload)
+        in: formData
+        name: sourceType
+        required: true
+        type: string
+      - description: Git URL (required if sourceType is git)
+        in: formData
+        name: sourceUrl
+        type: string
+      - description: Source archive (required if sourceType is upload)
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Deployment'
+      summary: Create a new deployment
+  /deployments/{id}:
+    delete:
+      description: Enqueue a deployment for deletion (soft delete)
+      parameters:
+      - description: Deployment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Accepted
+      summary: Delete a deployment
+    get:
+      description: Get detailed information about a specific deployment by ID
+      parameters:
+      - description: Deployment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Deployment'
+      summary: Get deployment details
+  /deployments/{id}/redeploy:
+    post:
+      description: Create a new deployment using the image from an existing deployment
+        (Rollback)
+      parameters:
+      - description: Source Deployment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Deployment'
+      summary: Redeploy an existing deployment
+swagger: "2.0"
