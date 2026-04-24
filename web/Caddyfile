@@ -1,0 +1,11 @@
+:80 {
+    root * /srv
+
+    @html {
+        path *.html /
+    }
+    header @html Cache-Control "no-store"
+
+    file_server
+    try_files {path} /index.html
+}

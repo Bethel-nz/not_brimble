@@ -1,0 +1,16 @@
+# Dev image for the web UI: Bun + Vite dev server with HMR.
+# Source is bind-mounted at /app by docker-compose.dev.yml; node_modules
+# is held in an anonymous volume so a host-side mount doesn't shadow the
+# in-container install.
+FROM oven/bun:latest
+
+WORKDIR /app
+
+# Prime the install during image build so first `docker compose up` is
+# faster. If package.json/bun.lock change later, the volume-mounted
+# install at startup will reconcile.
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile || bun install
+
+EXPOSE 3000
+CMD ["sh", "-c", "bun install && bun run dev"]

@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Black & white palette. All "semantic" accents (ok/warn/err/acc)
+     map to points on the grayscale — color is communicated by weight
+     and glyphs, not hue. */
+  --color-t-bg:    #09090b; /* zinc-950-ish */
+  --color-t-panel: #0f0f11;
+  --color-t-line:  #18181b; /* zinc-900 */
+  --color-t-rule:  #27272a; /* zinc-800 */
+  --color-t-dim:   #52525b; /* zinc-600 */
+  --color-t-mid:   #a1a1aa; /* zinc-400 */
+  --color-t-fg:    #e4e4e7; /* zinc-200 */
+  --color-t-hi:    #ffffff;
+  --color-t-acc:   #ffffff;
+  --color-t-ok:    #ffffff;
+  --color-t-warn:  #a1a1aa;
+  --color-t-err:   #e4e4e7;
+}
+
+html,body { background: var(--color-t-bg); color: var(--color-t-fg); font-family: var(--font-sans); }
+* { -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--color-t-rule); }
+input:focus,button:focus { outline: none; }
+.mono { font-family: var(--font-mono); font-feature-settings: "calt", "liga" 0; }
+
+@keyframes blink { 50% { opacity: 0; } }
+.caret { animation: blink 1s step-end infinite; }
+@keyframes dotPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.dot-pulse { animation: dotPulse 1.2s ease-in-out infinite; }
+@keyframes logIn { from { opacity: 0; transform: translateX(-2px); } to { opacity: 1; transform: translateX(0); } }
+.log-line { animation: logIn 0.12s ease-out; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.kbar-in { animation: slideIn 0.14s ease-out; }
+
+.tr-row.sel { background: rgba(255,255,255,0.05); border-left: 2px solid var(--color-t-hi); }
+.tr-row { border-left: 2px solid transparent; }
