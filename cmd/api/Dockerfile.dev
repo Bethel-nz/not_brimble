@@ -1,0 +1,13 @@
+# Dev image for the API: Go toolchain + air for hot reload.
+# Source is bind-mounted at /src by docker-compose.dev.yml.
+FROM golang:1.25.0-bookworm
+
+RUN apt-get update && apt-get install -y \
+    ca-certificates sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN go install github.com/air-verse/air@latest
+
+WORKDIR /src
+EXPOSE 8080
+CMD ["air", "-c", "cmd/api/.air.toml"]

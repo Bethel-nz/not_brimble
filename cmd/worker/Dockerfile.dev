@@ -1,0 +1,19 @@
+# Dev image for the worker: Go toolchain + air + docker CLI + railpack.
+# Source is bind-mounted at /src by docker-compose.dev.yml.
+FROM golang:1.25.0-bookworm
+
+RUN apt-get update && apt-get install -y \
+    ca-certificates git curl sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Docker CLI for railpack interop.
+RUN curl -fsSL https://get.docker.com | sh
+
+# Railpack builds source into images via buildkitd (BUILDKIT_HOST).
+RUN curl -sSL https://railpack.com/install.sh | sh
+
+# Air for hot rebuild on *.go changes.
+RUN go install github.com/air-verse/air@latest
+
+WORKDIR /src
+CMD ["air", "-c", "cmd/worker/.air.toml"]
