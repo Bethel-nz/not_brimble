@@ -11,7 +11,7 @@ vendor/
 # samples
 # *sample*
 # Keep the actual sample directories, but ignore their build artifacts or tarballs
-*.tar.gz
+# *.tar.gz
 
 
 # sqlite
