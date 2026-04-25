@@ -179,4 +179,4 @@ Roughly one focused day on backend + infra. Frontend is a separate pass.
 
 ## Brimble deploy + feedback
 
-Deployed a non-trivial project on the Hacker plan. Hit one hard blocker regarding quotas which was cleared same-day. Full write-up in [`feedback/`](./feedback/README.md).
+Deployed a non-trivial project ([jigsaw.brimble.app](https://jigsaw.brimble.app)) on the Hacker plan. Hit one hard blocker regarding quotas which was cleared same-day. Full write-up in [`feedback/`](./feedback/README.md).

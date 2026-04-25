@@ -16,7 +16,7 @@ I deliberately picked a project other PaaS providers have historically struggled
 
 One highlight: even though my project's build system emitted noisy 'Error rendering route' logs to stderr, Brimble correctly identified that the overall process completed successfully (exit 0). It didn't let the noisy logs derail the pipeline, ensuring a reliable transition to the running state. This level of 'log-agnostic' reliability is a huge plus for complex build tools.
 
-**Status:** Resolved after quota support (shout out to @pipe_dev). Deploy is live.
+**Status:** Resolved after quota support (shout out to @pipe_dev). Deploy is live at [jigsaw.brimble.app](https://jigsaw.brimble.app).
 
 ## 3. Repository search performance
 
